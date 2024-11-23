@@ -17,7 +17,7 @@ const FlashMessage = ({ message, type }) => {
   };
 
   return (
-    <div className={`fixed top-4 right-4 p-4 border-l-4 ${getTypeClasses()} rounded shadow-md`}>
+    <div className={`fixed top-20 right-4 p-4 border-l-4 ${getTypeClasses()} rounded shadow-md z-50`}>
       {message}
     </div>
   );

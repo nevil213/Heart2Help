@@ -7,35 +7,65 @@ import Cookies from "js-cookie"
 
 const Donor = () => {
 
-    const [donors, setDonors] = useState([])
+    // const [donors, setDonors] = useState([])
 
-    useEffect(()=>{
-        const fetchAllDonor = async () => {
-            try{
-                const res = await axios.get("http://localhost:8080/donor");
-                setDonors(res.data);
-            }catch(err){
-                console.log(err);
+    // useEffect(()=>{
+    //     const fetchAllDonor = async () => {
+    //         try{
+    //             const res = await axios.get("http://localhost:8080/donor");
+    //             setDonors(res.data);
+    //         }catch(err){
+    //             console.log(err);
+    //         }
+    //     }
+    //     fetchAllDonor();
+    // }, [])
+
+    // const handleDelete = async (id) => {
+    //   try{
+    //     await axios.delete("http://localhost:8080/donor/"+id);
+    //     window.location.reload();
+    //   }catch(err){
+    //     console.log(err);
+    //   }
+    // }
+
+    const [data, setData] = useState(null);
+    const [showSurvey, setShowSurvey] = useState(false);
+  
+    useEffect(() => {
+      const checkUserType = () => {
+        try {
+          if (JSON.parse(Cookies.get("user")).user.userType === 'patient') {
+            if(JSON.parse(Cookies.get("data")).data){
+              console.log(JSON.parse(Cookies.get("data")).data);
+              setShowSurvey(false);
             }
+          }
+        } catch (err) {
+          console.log(err);
         }
-        fetchAllDonor();
-    }, [])
-
-    const handleDelete = async (id) => {
-      try{
-        await axios.delete("http://localhost:8080/donor/"+id);
-        window.location.reload();
-      }catch(err){
-        console.log(err);
-      }
-    }
-
-    const Data = Cookies.get("Data");
+      };
+  
+      checkUserType();
+  
+      const fetchData = async () => {
+        try {
+          const cookieData = JSON.parse(Cookies.get("data"));
+          setData(cookieData.data);
+        } catch (err) {
+          console.log(err);
+        }
+      };
+  
+      fetchData();
+    }, []);
+  
 
   return (
     <div className='center'>
-      {!Data && <SmallEligibilityTest/>}
-      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTmpa-OPGCHyX-GPQRrwoR289o79lh94R-ERw&s" alt="" className='h-screen w-screen'/>
+      {!data && <SmallEligibilityTest/>}
+      <div className='h-screen w-screen bg-slate-600'/>
     </div>
   )
 }

@@ -10,8 +10,11 @@ function Signup({setUser}) {
         name:'',
         phoneNumber:'',
         email:'',
-        password:'',
         bloodType:'',
+        address:'',
+        city:'',
+        state:'',
+        password:'',
         role:''
     })
 
@@ -30,15 +33,24 @@ function Signup({setUser}) {
         e.preventDefault();
         try {
           const response = await axios.post("http://localhost:8080/signup", userData);
+          console.log(response);
           if (response.status === 200) {
-            Cookies.set('user', JSON.stringify(response.data.user));
-            setUser(response.data.user);
-            navigate("/");
+            // Cookies.set('user', JSON.stringify(response.data.user));
+            // setUser(response.data.user);
+            navigate("/login");
+          }
+          else if (response.status === 409){
+            setError(response.data.sqlMessage);
+            alert(response.data.sqlMessage);
           }
         } catch (err) {
             if (err.response && err.response.status === 400) {
                 setError(err.response.data.message);
                 alert(err.response.data.message); // Show alert for duplicate email or phone number
+              }
+              else if (err.response && err.response.status === 409){
+                setError(err.response.data.sqlMessage);
+                alert(err.response.data.sqlMessage);
               } else {
                 console.log(err);
               }
@@ -48,7 +60,7 @@ function Signup({setUser}) {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded shadow-md">
+      <div className="w-full max-w-md m-4 p-8 space-y-8 bg-white rounded shadow-md">
         <h2 className="text-2xl font-bold text-center text-gray-900">Sign Up</h2>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm">
@@ -94,20 +106,6 @@ function Signup({setUser}) {
               />
             </div>
             <div className="mt-4">
-              <label htmlFor="password" className="sr-only">Password</label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                minLength="8"
-                value={userData.password}
-                onChange={handleChange}
-                className="relative block w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Password"
-              />
-            </div>
-            <div className="mt-4">
               <label htmlFor="blood-type" className="sr-only">Blood Type</label>
               <select
                 id="blood-type"
@@ -129,6 +127,61 @@ function Signup({setUser}) {
               </select>
             </div>
             <div className="mt-4">
+              <label htmlFor="address" className="sr-only">Address</label>
+              <input
+                id="address"
+                name="address"
+                type="text"
+                required
+                value={userData.address}
+                onChange={handleChange}
+                className="relative block w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                placeholder="Address"
+              />
+            </div>
+            <div className="mt-4">
+              <label htmlFor="city" className="sr-only">City</label>
+              <input
+                id="city"
+                name="city"
+                type="text"
+                required
+                maxLength="45"
+                value={userData.city}
+                onChange={handleChange}
+                className="relative block w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                placeholder="City"
+              />
+            </div>
+            <div className="mt-4">
+              <label htmlFor="state" className="sr-only">State</label>
+              <input
+                id="state"
+                name="state"
+                type="state"
+                required
+                maxLength="45"
+                value={userData.state}
+                onChange={handleChange}
+                className="relative block w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                placeholder="State"
+              />
+            </div>
+            <div className="mt-4">
+              <label htmlFor="password" className="sr-only">Password</label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                required
+                minLength="8"
+                value={userData.password}
+                onChange={handleChange}
+                className="relative block w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                placeholder="Password"
+              />
+            </div>
+            <div className="mt-4">
               <label htmlFor="role" className="sr-only">Role</label>
               <select
                 id="role"
@@ -143,6 +196,18 @@ function Signup({setUser}) {
                 <option value="patient">Patient</option>
               </select>
             </div>
+          </div>
+          <div className="flex items-center mt-4">
+            <input
+              id="terms"
+              name="terms"
+              type="checkbox"
+              required
+              className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+            />
+            <label htmlFor="terms" className="ml-2 text-sm text-gray-600">
+              I agree to the <a href="/terms" className="font-medium text-indigo-600 hover:text-indigo-500">terms and conditions</a>
+            </label>
           </div>
           <div>
             <button

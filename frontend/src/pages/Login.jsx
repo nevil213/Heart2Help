@@ -6,7 +6,7 @@ import Cookies from 'js-cookie';
 
 function Login({ setUser }) {
   const [formData, setFormData] = useState({
-    email: '',
+    emailOrPhone: '',
     password: '',
     rememberMe: false
   });
@@ -25,15 +25,33 @@ function Login({ setUser }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("https://potential-trout-r47p97qrp7xx2gx5-3000.app.github.dev:8080/login", formData);
+      const response = await axios.post("http://localhost:8080/login", formData);
+      console.log(response);
+
       if (response.status === 200) {
         if (formData.rememberMe) {
           // Store user data in cookies
           // Cookies.set('user', JSON.stringify(response.data.user));
-          Cookies.set('user', JSON.stringify(response.data), { expires: 60 });
+          const { id, name, email, phoneNumber, bloodtype, address, city, state, password, userType } = response.data.user;
+          const filteredData0 = { user: { id, name, email, phoneNumber, bloodtype, address, city, state, password, userType } };
+          Cookies.set('user', JSON.stringify(filteredData0), { expires: 60 });
+          
+            const { isAdult, isHealthy, lastDonated } = response.data.user;
+            const filteredData = { data: { isAdult, isHealthy, lastDonated } };
+            if(isAdult && isHealthy && lastDonated){
+              Cookies.set('data', JSON.stringify(filteredData), { expires: 60 });
+            }
         }
         else{
-            Cookies.set('user', JSON.stringify(response.data));
+          const { id, name, email, phoneNumber, bloodtype, address, city, state, password, userType } = response.data.user;
+          const filteredData0 = { user: { id, name, email, phoneNumber, bloodtype, address, city, state, password, userType } };
+          Cookies.set('user', JSON.stringify(filteredData0));
+          
+          const { isAdult, isHealthy, lastDonated } = response.data.user;
+          const filteredData = { data: { isAdult, isHealthy, lastDonated } };
+          if(isAdult && isHealthy && lastDonated){
+            Cookies.set('data', JSON.stringify(filteredData));
+          }
         }
         setUser(response.data);
         navigate("/");
@@ -41,8 +59,8 @@ function Login({ setUser }) {
     } catch (err) {
       if (err.response && err.response.status === 400) {
         setError(err.response.data.message);
-      } else if (err.response && err.response.status === 401) {
-        setError("Email or Password is not correct!");
+      } else if (err.response && err.response.status === 404) {
+        setError(err.response.data.message);
       } else {
         console.log(err);
       }
@@ -56,18 +74,18 @@ function Login({ setUser }) {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {error && <div className="text-red-500 text-center">{error}</div>}
           <div className="rounded-md shadow-sm">
-            <div>
-              <label htmlFor="email-address" className="sr-only">Email address</label>
+            <div className="mt-4">
+              <label htmlFor="login-method" className="sr-only">Email or Phone Number</label>
               <input
-                id="email-address"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                value={formData.email}
-                onChange={handleChange}
-                className="relative block w-full px-3 py-2 border border-gray-300 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
+              id="login-method"
+              name="emailOrPhone"
+              type="text"
+              autoComplete="emailOrPhone"
+              required
+              value={formData.emailOrPhone}
+              onChange={handleChange}
+              className="relative block w-full px-3 py-2 border border-gray-300 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+              placeholder="Email or Phone Number"
               />
             </div>
             <div className="mt-4">
